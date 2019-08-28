@@ -1,12 +1,9 @@
-pipeline {
-  agent any
-    
-  tools {nodejs "node"}
-        
-    stage('Cloning Git') {
-      steps {
-        git 'https://github.com/mr097065/test.git'
-      }
+node {
+    stage('Postman_tests'){
+       git 'https://github.com/mr097065/test.git'
     }
-            
+
+    stage('build'){
+	 echo 'Hello from Git'
+    }
 }
