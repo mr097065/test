@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "4ccff300-7478-413b-a934-49aac02b0387",
+		"name": "AddressAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ASearch_200 Response_PAF",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c1609e32-ddd3-43b0-a27d-de65ad2ee2c1",
+						"exec": [
+							"eval(globals.postmanBDD);",
+							"const jsonData = pm.response.json();",
+							"const test= jsonData.results[0];",
+							"const addressSearchSchema = JSON.parse(globals.addressSearchSchema);",
+							"var selflink= jsonData.results[0].selfLink;",
+							"pm.globals.set('id', selflink.split('id=', 2)[1]);",
+							"console.log(pm.globals.get(\"id\"));",
+							"var invalidId= selflink.substr(79,115);",
+							"pm.globals.set(\"invalidId\", invalidId);",
+							"query = pm.globals.get('query');",
+							"",
+							"pm.test(\"validate status and responseCode- 200/OK \", ()=>{",
+							"    expect(responseCode.code).to.eql(200);",
+							"    expect(responseCode.name).to.eql('OK');",
+							"",
+							"});",
+							"",
+							"pm.test(\"response should be valid json and Not Empty\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.be.not.empty;",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"validate results count displayed is upto max 7\", ()=>{",
+							"    expect(jsonData._meta.count).to.be.below(8);",
+							"})",
+							"",
+							"pm.test(\"validate that results shown is relevant to search string\", ()=>{",
+							"    for( var i=0;i<jsonData.results.length;i++){",
+							"        var expected = query;",
+							"        expect(jsonData.results[i].address).includes(expected);",
+							"    }",
+							"})",
+							"",
+							"pm.test(\"validate JSON response\",()=>{",
+							"    expect(response).to.have.header('content-type' , 'application/json');",
+							"",
+							"})",
+							"",
+							"pm.test(\"response should have following keys - meta,results\", ()=>{",
+							"    expect(jsonData).to.have.keys(['_meta','results'])",
+							"})",
+							"",
+							"pm.test(\"results array should have following keys - address, selflink, score for PAF\", ()=>{",
+							"   for(var i=0;i<jsonData.results.length;i++){",
+							"        expect(jsonData.results[i]).to.have.keys(['address','selfLink'])",
+							"   }",
+							"})",
+							"",
+							"pm.test(\"Score is null for PAF dataset and is defaulted to PAF\" , ()=>{",
+							"    for(var i=0;i<jsonData.results.length;i++){",
+							"        expect(jsonData.results[i]).to.have.keys(['address','selfLink'])",
+							"   ",
+							"    }",
+							"})",
+							"",
+							"pm.test(\"AddressSearch schema validation for dataset PAF \", ()=>{",
+							"    const addressSearch  = JSON.parse(responseBody);",
+							"    var valid = tv4.validate(addressSearch, addressSearchSchema)",
+							"    if (valid !== true) {",
+							"      console.log(tv4.error);",
+							"    }",
+							"    pm.expect(valid).to.be.true;",
+							"  ",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d0def781-e14b-4769-85af-3653c5af94f2",
+						"exec": [
+							"pm.request.headers.add({key: 'x-api-cid', value: '{{x-api-cid}}'});",
+							"pm.request.headers.add({key: 'x-api-cs', value: '{{x-api-cs}}'});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{validationAPIURL}}/addresses/search?query={{query}}&country={{country}}&dataset=PAF",
+					"host": [
+						"{{validationAPIURL}}"
+					],
+					"path": [
+						"addresses",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{query}}"
+						},
+						{
+							"key": "country",
+							"value": "{{country}}"
+						},
+						{
+							"key": "dataset",
+							"value": "PAF"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
