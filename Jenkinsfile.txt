@@ -2,7 +2,9 @@ node {
     stage('Postman_tests'){
        git 'https://github.com/mr097065/test.git'
     }
-
+    agent {
+		label 'TestAuto'
+    }
     stage('build'){
 	 echo 'Hello from Git'
     }
